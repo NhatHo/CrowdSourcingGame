@@ -80,7 +80,7 @@ public class PlayerAutomated {
 					System.out.println ("NO AVAILABLE GAME ROOM AT THE MOMENT");
 				}
 				break;
-			case "sleep":
+			case "pause":
 				index++;
 				try {
 					Thread.sleep(Integer.parseInt(action[index]));
@@ -107,17 +107,32 @@ public class PlayerAutomated {
 			}
 			if (message.matches("wrong")) {
 				System.out.println ("The Game ID you used was INVALID, CHECK AGAIN!!!");
-				break;
 			}
 			if (message.equals ("GAME PAUSED")) {
 				System.out.println ("PLEASE WAIT ...");
 				continue;
 			} else if (message.equals("wait")) {
 				System.out.println ("Please wait till ROUND is over");
+				continue;
 			} else {
 				userAnswer = action[index];
 				send(userAnswer, controllerPort);
 			}
+			if (action[index].equals("pause")) {
+				index++;
+				try {
+					Thread.sleep(Integer.parseInt(action[index]));
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				index++;
+				userAnswer = action[index];
+			}
+			
+			System.out.println ("Your Answer ---> " + action[index]);
+			
 		}
 		String message = receiveData(); // Get Score from the game
 		System.out.println (message);
@@ -143,7 +158,7 @@ public class PlayerAutomated {
 		catch (IOException e2) { e2.printStackTrace(); System.exit(0);}
 	}
 	/**
-	 * Listen to any incoming message or packet
+	 * Listen to any incomfullBuffering message or packet
 	 * @return message			message or question from server
 	 */
 	public String receiveData () {

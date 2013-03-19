@@ -70,16 +70,8 @@ public class Merger extends Thread {
 		while (!shutDown.get()) {
 			do {
 				fullBuffer = manager.checkFinishedBuffer();
-				if (fullBuffer == -1){
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						System.out.println ("Failed to sleep somehow");
-						e.printStackTrace();
-					}
-				}
 			} while (fullBuffer == -1);
-			dataBuffer.addAll(manager.getFullBuffer(fullBuffer));
+				dataBuffer.addAll(manager.getFullBuffer(fullBuffer));
 			try {
 				writeFile (dataBuffer);
 				dataBuffer.clear();

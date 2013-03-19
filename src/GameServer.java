@@ -68,6 +68,7 @@ public class GameServer {
 	 */
 	public void finalize () {
 		receiveSocket.close();
+		sendSocket.close();
 	}
 	/**
 	 * Distribute the work to functions according to user request
@@ -158,7 +159,7 @@ public class GameServer {
 		
 		new Thread(){
 			public void run(){
-				//System.out.println("Enter 'quit' to quit");
+				System.out.println("Enter 'quit' to quit");
 				@SuppressWarnings("resource")
 				Scanner scanner = new Scanner(System.in);
 				String message;

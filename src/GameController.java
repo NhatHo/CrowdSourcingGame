@@ -59,7 +59,7 @@ public class GameController extends Thread {
 			// This socket will be used to receive UDP Datagram packets.
 			receiveSocket = new DatagramSocket(port);
 			gameId = receiveSocket.getLocalPort();
-			receiveSocket.setSoTimeout(120000);
+			receiveSocket.setSoTimeout(30000);
 			this.games = games;
 			this.questionList = questionList;
 			this.requestQueue = requestQueue;
