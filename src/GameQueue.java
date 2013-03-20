@@ -15,6 +15,7 @@ public class GameQueue {
 	 * @throws InterruptedException		If timed out before successfully adding
 	 */
 	public boolean addJoiner (String request) throws InterruptedException {
+		System.out.println ("Receive new player: " + request);
 		if (joinGameQueue.size() < MAXJOINER) {
 			joinGameQueue.offer(request, 300, TimeUnit.MICROSECONDS);
 			synchronized (joinGameQueue) {
@@ -48,7 +49,7 @@ public class GameQueue {
 	public String getJoiner (int flag, int gameId) throws InterruptedException {
 		synchronized (joinGameQueue) {
 			while (flag == 1 && joinGameQueue.size() == 0) {
-				joinGameQueue.wait(5000);
+				joinGameQueue.wait();
 			}
 		}	
 		if (joinGameQueue.size() > 0 && examineJoiner (gameId)) {

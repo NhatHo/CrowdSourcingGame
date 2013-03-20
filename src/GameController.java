@@ -37,7 +37,7 @@ public class GameController extends Thread {
 			// This socket will be used to receive UDP Datagram packets.
 			receiveSocket = new DatagramSocket();
 			gameId = receiveSocket.getLocalPort();
-			receiveSocket.setSoTimeout(30000);
+			receiveSocket.setSoTimeout(120000);
 			this.games = games;
 			this.questionList = questionList;
 			this.requestQueue = requestQueue;
@@ -49,6 +49,15 @@ public class GameController extends Thread {
 			System.exit(1);
 		}
 	}
+	/**
+	 * Second contructor for automation
+	 * @param port				Port of GameController
+	 * @param games				Object of GameDB
+	 * @param questionList		Object of questionList
+	 * @param requestQueue		Object of GameQueue
+	 * @param shutDown			Object of AtomicBoolean
+	 * @param manager			Object of BufferManager
+	 */
 	public GameController(int port, GameDB games, WordList questionList, GameQueue requestQueue, AtomicBoolean shutDown, BufferManager manager) {
 		try {
 			// Bind a datagram socket to any available port on the local host machine
@@ -90,9 +99,12 @@ public class GameController extends Thread {
 			scoreBoard.put(id, playerList.size() - turn);
 		} else {
 			scoreBoard.put(id, scoreBoard.get(id) + playerList.size() - turn);
-			System.out.println ("Player: " + id +", turn: " + turn + ", score: " + (scoreBoard.get(id) + playerList.size() - turn));
 		}
 	}
+	/**
+	 * Send score to specify player
+	 * @param player			The player ID or player's port
+	 */
 	private void displayScore(int player) {
 		String result = "++++++++++++++++++++++++\n Your score is: " + scoreBoard.get(player) + "\n++++++++++++++++++++++++\n";
 		for (Integer key : scoreBoard.keySet()) {
@@ -169,6 +181,11 @@ public class GameController extends Thread {
 			}
 			numOfResponse ++;
 			if (numOfResponse >= players) {
+				try {
+					Thread.sleep(1000); //sleep for a bit
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				break;
 			}	
 		}
@@ -180,6 +197,10 @@ public class GameController extends Thread {
 		} while (emptyBuffer == -1);
 		
 	}
+	/**
+	 * Wait to get 2nd player from the joiner Queue
+	 * @return				The 2nd player String request
+	 */
 	public String getSecondPlayer () {
 		String secondPlayer = "";
 		while (secondPlayer.length() == 0) {
@@ -213,6 +234,9 @@ public class GameController extends Thread {
 		catch (UnknownHostException e1)  { e1.printStackTrace(); System.exit(1);}
 		catch (IOException e2) { e2.printStackTrace(); System.exit(0);}
 	}
+	/**
+	 * Update the player list with the waitList at beginning of round
+	 */
 	public void updatePlayerList () {
 		if (waitList.size() > 0) {
 			playerList.addAll(waitList);
@@ -302,7 +326,10 @@ public class GameController extends Thread {
  		System.out.println ("GameRoom: " + gameId + " has been closed");
  	}
 }
-
+/**
+ * Observer of Controller, it will continuously check for new joiner for the game
+ * @author Nhat Ho
+ */
 class Observer extends Thread {
 	private AtomicBoolean shutDown;
 	private List<Integer> waitList;
@@ -322,7 +349,6 @@ class Observer extends Thread {
 				try {
 					newPlayer = requestQueue.getJoiner(0, gameId);
 					waitList.add(Integer.parseInt(newPlayer));
-					break;
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

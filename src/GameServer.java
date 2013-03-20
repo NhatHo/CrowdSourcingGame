@@ -77,11 +77,18 @@ public class GameServer {
 	public void processRequest (String request) {
 		if (request.matches("3 (\\d+) (\\d+)")) {
 			String[] elements = request.split(" ");
-			if (gameIdList.contains(Integer.parseInt(elements[2].trim()))) {
-				send ("wait", Integer.parseInt(elements[1].trim()));
-				joinGame (elements[1].trim() + " " + elements[2].trim());
-			} else {
-				send ("wrong", Integer.parseInt(elements[1].trim()));
+			int requestRoom = Integer.parseInt(elements[2].trim());
+			try {
+				if (gameIdList.contains(requestRoom) && gameList.getNoOfPlayers(requestRoom) != 0) {
+					send ("wait", Integer.parseInt(elements[1].trim()));
+					joinGame (elements[1].trim() + " " + elements[2].trim());
+				} else {
+					send ("wrong", Integer.parseInt(elements[1].trim()));
+				}
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		} else {
 			int userRequest = Integer.parseInt(request);
@@ -115,12 +122,21 @@ public class GameServer {
 			newGameController2.start();
 		}
 	}
-	
+	/**
+	 * Automatically spawn 2 Controllers with known ports ---> Used for automation
+	 * @param controller1			Port for COntroller 1
+	 * @param controller2			Port for controller 2
+	 */
 	private void spawnControllersAutomated (int controller1, int controller2) {
 		GameController newGameController1 = new GameController(controller1, gameList, questionList, requestQueue, shutDown, manager);
 		if (gameList.addNewGame(controller1)) {
 			gameIdList.add(controller1);
 			newGameController1.start();
+		}
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		GameController newGameController2 = new GameController(controller2, gameList, questionList, requestQueue, shutDown, manager);
 		if (gameList.addNewGame(controller2)) {
@@ -139,6 +155,9 @@ public class GameServer {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Create new game by adding the requester into creator queue
+	 */
 	public void createNewGame () {
 		try {
 			requestQueue.addCreator(receivePacket.getPort());

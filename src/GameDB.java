@@ -1,3 +1,8 @@
+/**
+ * @author: Nhat Ho
+ * @studentID: 100815111
+ * The game Database keeps track of the game ID and number of players associate with each game
+ */
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.Map;

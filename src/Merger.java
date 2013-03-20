@@ -1,3 +1,7 @@
+/**
+ * @author: Nhat Ho
+ * The Merger which will continuously check the multiple buffer and write results to files
+ */
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,13 +17,21 @@ public class Merger extends Thread {
 	private WordList questions;
 	private AtomicBoolean shutDown;
 	private String path;
+	/**
+	 * Constructor
+	 * @param manager			Object of BufferManager
+	 * @param questions			Object of WordList
+	 * @param shutDown			Object of AtomicBoolean
+	 */
 	public Merger (BufferManager manager, WordList questions, AtomicBoolean shutDown) {
 		this.manager = manager;
 		this.questions = questions;
 		this.shutDown = shutDown;
 		getPath();
 	}
-	
+	/**
+	 * Get absolute path for each machine from config.txt file
+	 */
 	public void getPath () {
 		File file = new File("config.txt");
 		Scanner input = null;
@@ -34,6 +46,11 @@ public class Merger extends Thread {
 		}
 		input.close();
 	}
+	/**
+	 * Write the answer from buffers to File
+	 * @param buffer				The buffer contains information
+	 * @throws IOException			
+	 */
 	public void writeFile (ArrayList<String> buffer) throws IOException {
 		File file = new File(path + "/storage/" + buffer.get(0) + ".txt");
 		FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
@@ -44,7 +61,10 @@ public class Merger extends Thread {
 		}
 		bw.close();
 	}
-	
+	/**
+	 * Create files if the required files don't exist on system
+	 * @throws IOException
+	 */
 	public void createFiles () throws IOException {
 		for (int i = 0; i < questions.getSize(); i++) {
 			File file = new File(path + "/storage/" + questions.getFile(i) + ".txt");
@@ -58,7 +78,9 @@ public class Merger extends Thread {
 			}
 		}
 	}
-	
+	/**
+	 * Run this thread continuously check for new information and update txt files
+	 */
 	public void run() {
 		try {
 			createFiles();

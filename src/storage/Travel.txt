@@ -1,2 +1,14 @@
 Where do you want to travel to?
+nhatrang
+cambodia
+vietnam
+france
+england
+italy
+finland
+philippines
+malaysia
+egypt
 0
+saudiarabia
+indonesia

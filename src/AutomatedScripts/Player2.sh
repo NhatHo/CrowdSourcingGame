@@ -3,7 +3,7 @@
 
 echo "========== THIS IS PLAYER 2 ============"
 
-java PlayerAutomated 2 3 50001 Cat pause 3000 KFC pause 100 Camry pause 500 quit 1 Lion pause 1000 Bagel pause 1000 Ram pause 200 Russia pause 230 Ireland pause 10000 0 
+java PlayerAutomated pause 1000 2 3 50001 pause 200 Cat pause 4500 KFC pause 3000 Toyota pause 200 Mexico pause 3000 France pause 200 0  
 echo "========== PLAYER 2 HAS EXITED ==========="
 sleep 30s
 

@@ -21,12 +21,9 @@ public class PlayerAutomated {
 		try {
 			// Bind a datagram socket to any available port on the local host machine. 
 			sendReceiveSocket = new DatagramSocket();
-			sendReceiveSocket.setSoTimeout(120000); // Set timeout for the socket (2 minutes)
+			sendReceiveSocket.setSoTimeout(30000); // Set timeout for the socket (2 minutes)
 			mainServerPort = 5000;
 			instantiateConnection();
-			for (int i = 0; i < inputs.length; i++) {
-				System.out.println ("The input is: " + inputs[i]);
-			}
 			createAction (inputs); 
 		} catch (SocketException se) {   // Can't create the socket.
 			System.out.println ("CANNOT find any available socket");
@@ -41,22 +38,32 @@ public class PlayerAutomated {
 	public void finalize () {
 		sendReceiveSocket.close();
 	}
-	
+	/**
+	 * Automatically act upon the descriptive request string in constructor
+	 * @param action				The action array to act on	
+	 */
 	public void createAction (String[] action) {
 		UserInterface userChoice = new UserInterface ();
+		boolean displayFlag = false;
 		for (index = 0; index < action.length; index++) {
-			userChoice.displayMenu();
+			if (!displayFlag){
+				userChoice.displayMenu();
+				System.out.print ("Your Choice ---> ");
+			}
+			displayFlag = false;
 			switch (action[index]) {
-			case "0": break;
+			case "0":
+				System.out.println ("0");
+				break;
 			case "1":
-				System.out.println ("Your Choice ---> 1");
+				System.out.println ("1");
 				send("1", mainServerPort);
 				controllerPort = Integer.parseInt(receiveData());
 				System.out.println (receiveData()); // get the greetings from GameController
 				reply (action);
 				break;
 			case "2":
-				System.out.println ("Your Choice ---> 2");
+				System.out.println ("2");
 				send("2", mainServerPort);
 				String gameList = receiveData();
 				if (gameList.length() != 0) {
@@ -66,7 +73,7 @@ public class PlayerAutomated {
 				}
 				break;
 			case "3":
-				System.out.println ("Your Choice ---> 3");
+				System.out.println ("3");
 				send("2", mainServerPort); // check the list of available game room
 				String tempGameList = receiveData();
 				if (tempGameList.length() != 0) { // prevent user try to connect to not available game room
@@ -89,13 +96,17 @@ public class PlayerAutomated {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				displayFlag = true;
 				break;
 			default: 
 				break;
 			}
 		}
 	}
-	
+	/**
+	 * Replay to the question sent by server
+	 * @param action			The action string contains answers
+	 */
 	public void reply (String[] action) {
 		String userAnswer = "";
 		while (!userAnswer.toLowerCase().equals("quit")) {
@@ -103,6 +114,7 @@ public class PlayerAutomated {
 			String message = receiveData(); // Round Start and Question
 			System.out.println (message);
 			if (message.matches("(\\W)* GAME OVER (\\W)*")) {
+				index--;
 				break;
 			}
 			if (message.matches("wrong")) {
@@ -110,29 +122,29 @@ public class PlayerAutomated {
 			}
 			if (message.equals ("GAME PAUSED")) {
 				System.out.println ("PLEASE WAIT ...");
+				index--;
 				continue;
 			} else if (message.equals("wait")) {
 				System.out.println ("Please wait till ROUND is over");
+				index--;
 				continue;
 			} else {
 				userAnswer = action[index];
-				send(userAnswer, controllerPort);
-			}
-			if (action[index].equals("pause")) {
-				index++;
-				try {
-					Thread.sleep(Integer.parseInt(action[index]));
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				if (action[index].equals("pause")) {
+					index++;
+					try {
+						Thread.sleep(Integer.parseInt(action[index]));
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					index++;
+					userAnswer = action[index];
 				}
-				index++;
-				userAnswer = action[index];
-			}
-			
-			System.out.println ("Your Answer ---> " + action[index]);
-			
+				send(userAnswer, controllerPort);
+				System.out.println ("Your Answer ---> " + userAnswer);
+			}			
 		}
 		String message = receiveData(); // Get Score from the game
 		System.out.println (message);
